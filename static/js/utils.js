@@ -20,11 +20,6 @@ function highlightDifferences(baseString, comparisonStringsArray) {
     return highlightedTexts;
 }
 
-function saveTranslationPair(original, translated) {
-    const translations = loadSavedTranslations();
-    translations.push({ original, translated });
-    localStorage.setItem('savedTranslations', JSON.stringify(translations));
-}
 
 function loadSavedTranslations() {
     const translations = localStorage.getItem('savedTranslations');

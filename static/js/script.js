@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     translateButton.addEventListener('click', handleTranslateClick);
 
     // Display saved translations on page load
-    displaySavedTranslations();
+    // displaySavedTranslations();
 });
 
 async function handleTranslateClick() {
@@ -56,11 +56,6 @@ function displayAlternatives(originalSentence, alternativesArray) {
         editButton.addEventListener('click', () => handleEditClick(index, text, div));
         div.appendChild(editButton);
 
-        const acceptButton = document.createElement('button');
-        acceptButton.className = 'accept-button';
-        acceptButton.textContent = 'Accept';
-        acceptButton.addEventListener('click', () => handleAcceptClick(originalSentence, alternative));
-        div.appendChild(acceptButton);
 
         const saveButton = document.createElement('button');
         saveButton.className = 'save-button';
@@ -89,7 +84,7 @@ function handleEditClick(index, currentTextElement, alternativeDiv) {
 
     const saveButton = document.createElement('button');
     saveButton.className = 'save-button';
-    saveButton.textContent = 'Save';
+    saveButton.textContent = 'Save to File';
     saveButton.addEventListener('click', () => handleSaveEditClick(index, textarea, originalText, alternativeDiv));
     alternativeDiv.appendChild(saveButton);
 }
@@ -102,8 +97,6 @@ function handleSaveEditClick(index, textareaElement, originalSentence, alternati
 
     const saveButton = alternativeDiv.querySelector('.save-button');
     saveButton.remove();
-
-    handleAcceptClick(originalSentence, editedText);
 }
 
 function saveTranslationToFile(originalSentence, translationText) {
@@ -123,9 +116,4 @@ function saveTranslationToFile(originalSentence, translationText) {
         console.error('Error saving translation:', error);
         alert('Failed to save translation');
     });
-}
-
-function handleAcceptClick(originalSentence, acceptedTranslationText) {
-    saveTranslationPair(originalSentence, acceptedTranslationText);
-    alert('Translation accepted and saved!');
 }
