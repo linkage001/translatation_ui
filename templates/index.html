@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iterative Translation Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Iterative Translation Assistant</h1>
+        <textarea id="original-text-input" placeholder="Enter the sentence to translate"></textarea>
+        <button id="translate-button">Translate</button>
+        <div id="alternatives-container"></div>
+        <div id="error-message" style="color: red;"></div>
+    </div>
+    <script src="{{ url_for('static', filename='js/utils.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</body>
+</html>
