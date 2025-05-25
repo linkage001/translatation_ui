@@ -4,3 +4,4 @@ venv/
 *.pyo
 *.pyd
 .env
+translation.txt

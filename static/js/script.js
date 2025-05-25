@@ -95,6 +95,9 @@ function handleSaveEditClick(index, textareaElement, originalSentence, alternati
     pElement.innerHTML = editedText;
     textareaElement.replaceWith(pElement);
 
+    // Save the edited translation to file
+    saveTranslationToFile(originalSentence, editedText);
+
     const saveButton = alternativeDiv.querySelector('.save-button');
     saveButton.remove();
 }
