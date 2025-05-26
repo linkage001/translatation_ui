@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from llm import LLM
+from qwen_local import LLM
 import json
 
 app = Flask(__name__)
@@ -22,7 +22,13 @@ def translate_text():
     print(prompt)
 
     try:
-        alternatives = json.loads(llm_instance.completion(prompt))["translations"]
+        answer = llm_instance.completion(prompt)
+        print(answer)
+        if "```" in answer:
+            answer = "{" + answer.split("```")[1].split("{")[1]
+            alternatives = json.loads(answer)["translations"]
+        else:
+            alternatives = json.loads(answer)["translations"]
         print(str(alternatives))
         if not isinstance(alternatives, list) or len(alternatives) != 4:
             return jsonify({'error': 'LLM did not return the expected format'}), 500
@@ -34,9 +40,8 @@ def build_prompt_with_context(original_sentence, saved_translations):
     context_str = ""
     with open('translation.txt', 'r') as f:
         context_str = f.read()
-    prompt = f"""<|im_start|>user
-{context_str}Considering the examples above, translate the following sentence into 4 different variations, showing subtle nuances where possible using a JSON blob inside a code block like the example below:
-'''    
+    prompt = f"""{context_str}Considering the examples above, translate the following sentence into 4 different variations, showing subtle nuances where possible using a JSON blob inside a code block like the example below:
+```    
 {{
   "original_phrase": "The big red fox ate a steak at McDonalds.",
   "translations": [
@@ -46,9 +51,8 @@ def build_prompt_with_context(original_sentence, saved_translations):
       "Uma raposa grande, de pelo avermelhado, comeu um bife no McDonald's."
   ]
 }}
-'''
-\n\nOriginal sentence: {original_sentence}\n\n<|im_end|>
-<|im_start|>assistant
+```
+\n\nOriginal sentence: {original_sentence}\n\n
 """
     return prompt
 

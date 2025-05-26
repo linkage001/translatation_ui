@@ -82,8 +82,11 @@ class LLM:
         self.logit_bias = logit_bias
         self.n_probs = n_probs
 
-    def completion(self, prompt, preset='', callback=''):
-        """Continue the text in `prompt`.
+    def completion(self, prompt, preset='', callback='', is_question=True):
+        if is_question:
+            prompt = f"<|im_start|>user\n{prompt}<|im_end|>\n<|im_start|>assistant"
+        """Continue the text in `prompt`. Add user/assistant tags by default. If you want to use simple completion, 
+        set is_question to False.
         `callback` is called by callback(b'data: {"content":"token","stop":false}').
         Return is like the following:
             {
