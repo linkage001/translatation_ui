@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, jsonify
-from qwen_local import LLM
+from qwen_local import LLM as QwenLLM
+from gemini import LLM as GeminiLLM
 import json
 
 app = Flask(__name__)
-llm_instance = LLM()  # Initialize with None or appropriate arguments
+llm_instance = QwenLLM()  # Default to Qwen
 
 @app.route('/')
 def index():
@@ -14,11 +15,19 @@ def translate_text():
     data = request.get_json()
     original_sentence = data.get('original_sentence')
     saved_translations_context = data.get('saved_translations', [])
+    model_choice = data.get('model', 'qwen')  # Default to 'qwen' if not provided
 
     if not original_sentence:
         return jsonify({'error': 'No sentence provided'}), 400
 
+    # Select the appropriate LLM instance based on user choice
+    if model_choice == 'gemini':
+        llm_instance = GeminiLLM()
+    else:
+        llm_instance = QwenLLM()
+
     prompt = build_prompt_with_context(original_sentence, saved_translations_context)
+    print(f"Using model: {model_choice}")
     print(prompt)
 
     try:
@@ -74,4 +83,4 @@ def save_translation():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5002)

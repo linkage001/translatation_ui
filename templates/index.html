@@ -9,6 +9,16 @@
 <body>
     <div class="container">
         <h1>Iterative Translation Assistant</h1>
+        <div id="model-selector">
+            <label>
+                <input type="radio" name="model" value="qwen" checked>
+                <span>Qwen (llama.cpp)</span>
+            </label>
+            <label>
+                <input type="radio" name="model" value="gemini">
+                <span>Gemini (API)</span>
+            </label>
+        </div>
         <textarea id="original-text-input" placeholder="Enter the sentence to translate"></textarea>
         <button id="translate-button">Translate</button>
         <div id="alternatives-container"></div>

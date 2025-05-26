@@ -12,11 +12,25 @@ async function handleTranslateClick() {
     const errorMessageDiv = document.getElementById('error-message');
     errorMessageDiv.textContent = '';
 
+    // Get the selected model
+    const modelRadios = document.getElementsByName('model');
+    let selectedModel = 'qwen'; // Default value
+    for (let radio of modelRadios) {
+        if (radio.checked) {
+            selectedModel = radio.value;
+            break;
+        }
+    }
+
     try {
         const response = await fetch('/translate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ original_sentence: originalText, saved_translations: savedTranslations })
+            body: JSON.stringify({
+                original_sentence: originalText,
+                saved_translations: savedTranslations,
+                model: selectedModel
+            })
         });
 
         if (!response.ok) {
