@@ -1,1 +1,5 @@
-Flask
+flask
+google-generativeai
+google-api-core
+requests
+python-dotenv
