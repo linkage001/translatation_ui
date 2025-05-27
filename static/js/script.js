@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load existing prompt if available
     loadPrompt();
+
+    // Load translations
+    loadTranslations();
 });
 
 async function handleTranslateClick() {
@@ -190,4 +193,83 @@ function loadPrompt() {
     .catch(error => {
         console.error('Error loading prompt:', error);
     });
+}
+
+function loadTranslations() {
+    fetch('/get_translations')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to load translations');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.translations) {
+            displayTranslations(data.translations);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading translations:', error);
+    });
+}
+
+function displayTranslations(translations) {
+    const container = document.getElementById('translations-list');
+    container.innerHTML = '';
+
+    translations.forEach((translation, index) => {
+        const div = document.createElement('div');
+        div.className = 'translation';
+
+        const original = document.createElement('p');
+        original.innerHTML = `<strong>Original:</strong> ${translation.original}`;
+        div.appendChild(original);
+
+        const translationText = document.createElement('p');
+        translationText.innerHTML = `<strong>Translation:</strong> ${translation.translation}`;
+        div.appendChild(translationText);
+
+        const editButton = document.createElement('button');
+        editButton.className = 'edit-button';
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', () => handleTranslationEditClick(index, translationText, div));
+        div.appendChild(editButton);
+
+        container.appendChild(div);
+    });
+}
+
+function handleTranslationEditClick(index, currentTextElement, translationDiv) {
+    // Remove any existing save button
+    const existingSaveButton = translationDiv.querySelector('.save-button');
+    if (existingSaveButton) {
+        existingSaveButton.remove();
+    }
+
+    const originalText = currentTextElement.innerHTML;
+    const textarea = document.createElement('textarea');
+    textarea.value = originalText.match(/<strong>Translation:<\/strong> (.+)/)[1];
+    textarea.rows = 3;
+
+    currentTextElement.replaceWith(textarea);
+    textarea.focus();
+
+    const saveButton = document.createElement('button');
+    saveButton.className = 'save-button';
+    saveButton.textContent = 'Save to File';
+    saveButton.addEventListener('click', () => handleTranslationSaveEditClick(index, textarea, originalText, translationDiv));
+    translationDiv.appendChild(saveButton);
+}
+
+function handleTranslationSaveEditClick(index, textareaElement, originalSentence, translationDiv) {
+    const editedText = textareaElement.value;
+    const pElement = document.createElement('p');
+    pElement.innerHTML = `<strong>Translation:</strong> ${editedText}`;
+    textareaElement.replaceWith(pElement);
+
+    // Save the edited translation to file
+    saveTranslationToFile(originalSentence.match(/<strong>Original:<\/strong> (.+)/)[1], editedText);
+
+    const saveButton = translationDiv.querySelector('.save-button');
+    saveButton.remove();
 }

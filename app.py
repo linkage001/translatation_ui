@@ -99,11 +99,23 @@ def save_translation():
             with open('translations.yaml', 'r', encoding="utf-8") as f:
                 translations = yaml.safe_load(f) or []
 
-        new_entry = {
-            'original': original_sentence,
-            'translation': translation
-        }
-        translations.append(new_entry)
+        # Check if the translation already exists
+        existing_entry = None
+        for entry in translations:
+            if entry.get('original') == original_sentence:
+                existing_entry = entry
+                break
+
+        if existing_entry:
+            # Update the existing entry
+            existing_entry['translation'] = translation
+        else:
+            # Add a new entry
+            new_entry = {
+                'original': original_sentence,
+                'translation': translation
+            }
+            translations.append(new_entry)
 
         with open('translations.yaml', 'w', encoding="utf-8") as f:
             yaml.dump(translations, f, default_flow_style=False, allow_unicode=True)
@@ -133,6 +145,17 @@ def get_prompt():
         with open('user_prompt.txt', 'r', encoding="utf-8") as f:
             prompt = f.read().strip()
         return jsonify({'prompt': prompt}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_translations', methods=['GET'])
+def get_translations():
+    try:
+        translations = []
+        if os.path.exists('translations.yaml'):
+            with open('translations.yaml', 'r', encoding="utf-8") as f:
+                translations = yaml.safe_load(f) or []
+        return jsonify({'translations': translations}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
