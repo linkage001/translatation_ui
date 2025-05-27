@@ -1,9 +1,2 @@
-Original: 人は難しい
-Translation: People are difficult.
-
-Original: Rabbits are easy.
-Translation: Rabbits are easy!
-
-Original: じゃあうさぎにする！
-Translation: Alright then, let's do the rabbit thing!
-
+# This file is no longer used for storing translations.
+# Please use translations.yaml instead, which stores translations in YAML format.
