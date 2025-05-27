@@ -47,7 +47,7 @@ def translate_text():
 
 def build_prompt_with_context(original_sentence, saved_translations):
     context_str = ""
-    with open('translation.txt', 'r') as f:
+    with open('translation.txt', 'r', encoding="utf-8") as f:
         context_str = f.read()
     prompt = f"""{context_str}Considering the examples above, translate the following sentence into 4 different variations, showing subtle nuances where possible using a JSON blob inside a code block like the example below:
 ```    
