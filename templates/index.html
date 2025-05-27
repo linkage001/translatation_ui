@@ -7,8 +7,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Iterative Translation Assistant</h1>
+    <div class="app-container">
+        <header>
+            <h1>Iterative Translation Assistant</h1>
+        </header>
+        <div class="main-content">
+            <div class="container">
         <div id="prompt-editor">
             <h2>Edit Translation Prompt</h2>
             <textarea id="prompt-input" rows="4" placeholder="Enter your custom translation prompt"></textarea>
@@ -29,6 +33,8 @@
         <button id="translate-button">Translate</button>
         <div id="alternatives-container"></div>
         <div id="error-message" style="color: red;"></div>
+            </div>
+        </div>
     </div>
     <script src="{{ url_for('static', filename='js/utils.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
