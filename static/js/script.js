@@ -2,8 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const translateButton = document.getElementById('translate-button');
     translateButton.addEventListener('click', handleTranslateClick);
 
-    // Display saved translations on page load
-    // displaySavedTranslations();
+    const updatePromptButton = document.getElementById('update-prompt-button');
+    updatePromptButton.addEventListener('click', handleUpdatePromptClick);
+
+    // Load existing prompt if available
+    loadPrompt();
 });
 
 async function handleTranslateClick() {
@@ -132,5 +135,59 @@ function saveTranslationToFile(originalSentence, translationText) {
     .catch(error => {
         console.error('Error saving translation:', error);
         alert('Failed to save translation');
+    });
+}
+
+async function handleUpdatePromptClick() {
+    const promptInput = document.getElementById('prompt-input').value;
+    const statusMessage = document.getElementById('prompt-status-message');
+    statusMessage.textContent = '';
+
+    if (!promptInput.trim()) {
+        statusMessage.textContent = 'Prompt cannot be empty';
+        statusMessage.style.color = 'red';
+        return;
+    }
+
+    try {
+        const response = await fetch('/update_prompt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: promptInput })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Server error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            statusMessage.textContent = 'Prompt updated successfully';
+            // Update the display
+            loadPrompt();
+        }
+    } catch (error) {
+        console.error("Error updating prompt:", error);
+        statusMessage.textContent = error.message;
+        statusMessage.style.color = 'red';
+    }
+}
+
+function loadPrompt() {
+    fetch('/get_prompt')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to load prompt');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.prompt) {
+            document.getElementById('prompt-input').value = data.prompt;
+        }
+    })
+    .catch(error => {
+        console.error('Error loading prompt:', error);
     });
 }

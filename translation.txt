@@ -1,0 +1,9 @@
+Original: 人は難しい
+Translation: People are difficult.
+
+Original: Rabbits are easy.
+Translation: Rabbits are easy!
+
+Original: じゃあうさぎにする！
+Translation: Alright then, let's do the rabbit thing!
+

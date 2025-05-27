@@ -51,7 +51,11 @@ def build_prompt_with_context(original_sentence, saved_translations):
         context_str = f.read()
     with open('glossary.txt', 'r', encoding="utf-8") as f:
         glossary = f.read()
-    user_editable_prompt = f"""Traduza a frase abaixo de 4 formas diferentes considerando as nuances possíveis e as diferenças de interpretação semântica."""
+    try:
+        with open('user_prompt.txt', 'r', encoding="utf-8") as f:
+            user_editable_prompt = f.read().strip()
+    except FileNotFoundError:
+        user_editable_prompt = """Traduza a frase abaixo de 4 formas diferentes considerando as nuances possíveis e as diferenças de interpretação semântica."""
     prompt = f"""{context_str}{glossary}{user_editable_prompt} Utilize um JSON blob dentro de um code block como no exemplo abaixo:
 ```    
 {{
@@ -82,6 +86,30 @@ def save_translation():
             f.write(f"Original: {original_sentence}\n")
             f.write(f"Translation: {translation}\n\n")
         return jsonify({'success': 'Translation saved successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/update_prompt', methods=['POST'])
+def update_prompt():
+    data = request.get_json()
+    new_prompt = data.get('prompt')
+
+    if not new_prompt:
+        return jsonify({'error': 'No prompt provided'}), 400
+
+    try:
+        with open('user_prompt.txt', 'w', encoding="utf-8") as f:
+            f.write(new_prompt)
+        return jsonify({'success': 'Prompt updated successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/get_prompt', methods=['GET'])
+def get_prompt():
+    try:
+        with open('user_prompt.txt', 'r', encoding="utf-8") as f:
+            prompt = f.read().strip()
+        return jsonify({'prompt': prompt}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

@@ -9,6 +9,12 @@
 <body>
     <div class="container">
         <h1>Iterative Translation Assistant</h1>
+        <div id="prompt-editor">
+            <h2>Edit Translation Prompt</h2>
+            <textarea id="prompt-input" rows="4" placeholder="Enter your custom translation prompt"></textarea>
+            <button id="update-prompt-button">Update Prompt</button>
+            <div id="prompt-status-message" style="color: green;"></div>
+        </div>
         <div id="model-selector">
             <label>
                 <input type="radio" name="model" value="qwen" checked>
