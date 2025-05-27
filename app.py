@@ -49,15 +49,15 @@ def build_prompt_with_context(original_sentence, saved_translations):
     context_str = ""
     with open('translation.txt', 'r') as f:
         context_str = f.read()
-    prompt = f"""{context_str}Considering the examples above, translate the following sentence into 4 different variations, showing subtle nuances where possible using a JSON blob inside a code block like the example below:
+    prompt = f"""{context_str}Traduza a frase abaixo de 4 formas diferentes considerando as nuances possíveis e as diferenças de interpretação semântica, utilizando blob JSON dentro de um bloco de código como no exemplo abaixo:
 ```    
 {{
-  "original_phrase": "The big red fox ate a steak at McDonalds.",
+  "original_phrase": "堀川の大殿様のやうな方は、これまでは固より、後の世には恐らく二人とはいらつしやいますまい。",
   "translations": [
-      "A grande raposa vermelha comeu um bife no McDonald's.",
-      "A raposa grande e ruiva comeu um bife no McDonald's.",
-      "A raposa vermelha e grande devorou um filé no McDonald's.",
-      "Uma raposa grande, de pelo avermelhado, comeu um bife no McDonald's."
+      "Uma pessoa como o senhor feudal de Horikawa, claro que até hoje nunca houve igual, e no futuro, provavelmente, não haverá sequer mais um como ele.",
+      "Alguém como o grande senhor de Horikawa — já era raro até agora, e no futuro, é quase certo que não haverá outro com tal dignidade.",
+      "Pessoas como o senhor de Horikawa eram raras até hoje, e provavelmente não haverá duas no futuro.",
+      "Homens como o nobre de Horikawa — já únicos até agora — jamais dividirão este mundo com um igual em tempos vindouros."
   ]
 }}
 ```
@@ -75,7 +75,7 @@ def save_translation():
         return jsonify({'error': 'Missing data'}), 400
 
     try:
-        with open('translation.txt', 'a') as f:
+        with open('translation.txt', 'a', encoding='utf-8') as f:
             f.write(f"Original: {original_sentence}\n")
             f.write(f"Translation: {translation}\n\n")
         return jsonify({'success': 'Translation saved successfully'}), 200
