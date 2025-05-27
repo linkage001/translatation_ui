@@ -76,7 +76,7 @@ def save_translation():
 
     try:
         with open('translation.txt', 'a', encoding='utf-8') as f:
-            f.write(f"Translation: {translation}\n\n")
+            f.write(f"{translation} ")
         return jsonify({'success': 'Translation saved successfully'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
