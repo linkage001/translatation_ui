@@ -47,7 +47,7 @@ def translate_text():
 
 def build_prompt_with_context(original_sentence, saved_translations):
     context_str = ""
-    with open('translation.txt', 'r', endoding='utf-8') as f:
+    with open('translation.txt', 'r', encoding='utf-8') as f:
         context_str = f.read()
     prompt = f"""{context_str}Traduza a frase abaixo de 4 formas diferentes considerando as nuances possíveis e as diferenças de interpretação semântica, utilizando blob JSON dentro de um bloco de código como no exemplo abaixo:
 ```    
