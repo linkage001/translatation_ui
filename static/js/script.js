@@ -261,14 +261,17 @@ function handleTranslationEditClick(index, currentTextElement, translationDiv) {
     translationDiv.appendChild(saveButton);
 }
 
-function handleTranslationSaveEditClick(index, textareaElement, originalSentence, translationDiv) {
+function handleTranslationSaveEditClick(index, textareaElement, originalSentenceHtml, translationDiv) {
     const editedText = textareaElement.value;
     const pElement = document.createElement('p');
     pElement.innerHTML = `<strong>Translation:</strong> ${editedText}`;
     textareaElement.replaceWith(pElement);
 
+    // Extract original sentence from the first child element (original paragraph)
+    const originalSentence = translationDiv.querySelector('p:first-child').innerHTML.match(/<strong>Original:<\/strong> (.+)/)[1];
+
     // Save the edited translation to file
-    saveTranslationToFile(originalSentence.match(/<strong>Original:<\/strong> (.+)/)[1], editedText);
+    saveTranslationToFile(originalSentence, editedText);
 
     const saveButton = translationDiv.querySelector('.save-button');
     saveButton.remove();
