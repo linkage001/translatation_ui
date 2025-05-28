@@ -9,7 +9,7 @@ class LLM:
     
     config = dotenv_values(".env")  # config = {"USER": "foo", "EMAIL": "foo@example.org"}
     api_key = config["GOOGLE_API_KEY"]
-    MODEL_NAME = "gemini-2.5-flash-preview-04-17"
+    MODEL_NAME = "gemini-2.5-flash-preview-05-20"
     MODEL_FALLBACK_NAME = "gemini-2.0-flash-001" # A model that might have different limits or capabilities
     HYPOTHETICAL_MODEL_LIMIT_PRIMARY = 245000  # Primary model's hypothetical token limit for the whole prompt
     HYPOTHETICAL_MODEL_LIMIT_FALLBACK = 1000000 # Fallback model's hypothetical token limit
