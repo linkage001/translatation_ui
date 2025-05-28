@@ -80,7 +80,7 @@ def build_prompt_with_context(original_sentence, saved_translations):
   ]
 }}
 ```
-\n\nOriginal sentence: {original_sentence}\n\n
+\n\nTranslate the following sentence: {original_sentence}\n\n
 """
     return prompt
 
