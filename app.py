@@ -1,7 +1,9 @@
+import os
 from flask import Flask, render_template, request, jsonify
 from gemini import LLM as GeminiLLM
 import json
 import re
+import xml.etree.ElementTree as ET # Import for XML parsing
 
 app = Flask(__name__)
 llm_instance = GeminiLLM()
@@ -178,7 +180,7 @@ def build_prompt_with_context(original_sentence, saved_translations):
       - 紅蓮大紅蓮: "Lótus Vermelho e Grande Lótus Vermelho (infernos frios)"
       - 剣山刀樹: "A Montanha de Espadas e as Árvores de Lâminas"
 
-  obras_de_arte:
+  obras_de_artes:
     - 地獄変の屏風: "O Painel do Inferno"
     - 五趣生死の絵: "A Pintura dos Cinco Reinos da Transmigração"
     - よぢり不動: "O Fudō Torcido (pintura)"
@@ -219,7 +221,7 @@ def build_prompt_with_context(original_sentence, saved_translations):
       - 蒔絵の高坏: "Pedestal de Laca com Incrustações Douradas"
       - 檳榔毛の車: "Carruagem com Teto de Fibra de Palmeira"
 Considerando as traduções anteriores e a lista de referências, traduza a frase abaixo de 4 formas diferentes considerando as nuances possíveis e as diferenças de interpretação semântica. Pesquise o nome de entidades utilizando blob JSON dentro de um bloco de código como no exemplo abaixo:
-```    
+```
 {{
   "original_phrase": "堀川の大殿様のやうな方は、これまでは固より、後の世には恐らく二人とはいらつしやいますまい。",
   "translations": [
@@ -241,15 +243,146 @@ def save_translation():
     original_sentence = data.get('original_sentence')
     translation = data.get('translation')
 
+    # IMPORTANT: The target language (e.g., 'es' for Spanish) is not provided
+    # in the original request. For a robust TMX file, you should ideally
+    # send this from the client (e.g., `data.get('target_language')`).
+    # For this example, we'll hardcode 'es' as the target language for the TMX entry.
+    target_language_code = "es" # Placeholder: consider passing this from the client
+
+    # Validate incoming data
     if not original_sentence or not translation:
-        return jsonify({'error': 'Missing data'}), 400
+        return jsonify({'error': 'Missing original_sentence or translation data'}), 400
+
+    # Define file paths
+    txt_file_path = 'translation.txt'
+    tmx_file_path = 'translation_memory.tmx'
 
     try:
-        with open('translation.txt', 'a', encoding='utf-8') as f:
+        # --- Save translated text to .txt file ---
+        # Opens the file in append mode ('a'). If the file doesn't exist, it will be created.
+        # Each translation is appended with a space, as per your original request.
+        with open(txt_file_path, 'a', encoding='utf-8') as f:
             f.write(f"{translation} ")
-        return jsonify({'success': 'Translation saved successfully'}), 200
+
+        # --- Prepare TMX translation unit (tu) ---
+        # This XML snippet represents one translation unit with source (en) and target (dynamic) segments.
+        tmx_entry = f"""    <tu>
+      <tuv xml:lang="en">
+        <seg>{original_sentence}</seg>
+      </tuv>
+      <tuv xml:lang="{target_language_code}">
+        <seg>{translation}</seg>
+      </tuv>
+    </tu>"""
+
+        # --- Save source and target in .tmx file ---
+        # This part handles creating the TMX file with its proper header if it doesn't exist,
+        # or appending new translation units to an existing TMX file.
+        if not os.path.exists(tmx_file_path):
+            # If the TMX file does not exist, create it with the full TMX header and the first entry.
+            # The header includes metadata about the translation memory.
+            tmx_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<tmx version="1.4">
+  <header
+    creationtool="GeminiTranslatorApp"
+    creationtoolversion="1.0"
+    datatype="plaintext"
+    segtype="sentence"
+    adminlang="en-us"
+    srclang="en"
+    o-tmf="PythonFlask"
+    o-encoding="UTF-8"
+  >
+  </header>
+  <body>
+{tmx_entry}
+  </body>
+</tmx>"""
+            with open(tmx_file_path, 'w', encoding='utf-8') as f:
+                f.write(tmx_content)
+        else:
+            # If the TMX file already exists, we need to insert the new entry
+            # before the closing </body> tag to maintain valid XML structure.
+            with open(tmx_file_path, 'r+', encoding='utf-8') as f:
+                lines = f.readlines() # Read all existing lines
+                f.seek(0)            # Move the file pointer to the beginning
+                f.truncate()         # Clear the file content (we'll rewrite it)
+
+                inserted = False
+                for line in lines:
+                    # Look for the </body> tag and insert the new entry just before it.
+                    if '</body>' in line and not inserted:
+                        f.write(tmx_entry + "\n") # Add the new TMX entry, followed by a newline
+                        inserted = True
+                    f.write(line) # Write the current line back to the file
+
+                # Fallback: If </body> was not found (e.g., malformed file or first entry),
+                # append the entry and ensure closing tags are present.
+                if not inserted:
+                    f.write(tmx_entry + "\n")
+                    # Ensure body and tmx closing tags are present if they were missing
+                    if not any('</body>' in l for l in lines):
+                        f.write("  </body>\n")
+                    if not any('</tmx>' in l for l in lines):
+                        f.write("</tmx>\n")
+
+        return jsonify({'success': 'Translation saved successfully to .txt and .tmx'}), 200
+
     except Exception as e:
+        # Catch any exceptions during file operations and return an error message.
         return jsonify({'error': str(e)}), 500
+
+@app.route('/get_translations', methods=['GET'])
+def get_translations():
+    """
+    Reads the translation_memory.tmx file, parses it, and returns
+    all stored original and translated sentences.
+    """
+    tmx_file_path = 'translation_memory.tmx'
+    translations = []
+
+    if not os.path.exists(tmx_file_path):
+        return jsonify({'message': 'No translation memory file found.'}), 404
+
+    try:
+        # Parse the TMX XML file
+        tree = ET.parse(tmx_file_path)
+        root = tree.getroot()
+
+        # Iterate through each translation unit (tu)
+        for tu in root.findall('.//tu'):
+            original_seg = None
+            translated_seg = None
+            original_lang = None
+            translated_lang = None
+
+            # Find translation unit variants (tuv)
+            for tuv in tu.findall('tuv'):
+                lang = tuv.get('{http://www.w3.org/XML/1998/namespace}lang') # Get xml:lang attribute
+                seg = tuv.find('seg') # Find the segment tag
+
+                if seg is not None:
+                    if lang == 'en': # Assuming 'en' is always the source language
+                        original_seg = seg.text
+                        original_lang = lang
+                    else: # Assuming any other language is the target language
+                        translated_seg = seg.text
+                        translated_lang = lang
+
+            if original_seg and translated_seg:
+                translations.append({
+                    'original_sentence': original_seg,
+                    'original_language': original_lang,
+                    'translated_sentence': translated_seg,
+                    'translated_language': translated_lang
+                })
+
+        return jsonify(translations), 200
+
+    except ET.ParseError as e:
+        return jsonify({'error': f'Failed to parse TMX file: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'An unexpected error occurred: {str(e)}'}), 500
 
 
 if __name__ == '__main__':
