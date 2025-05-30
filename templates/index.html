@@ -4,26 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iterative Translation Assistant</title>
+
+    <!-- main stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>Iterative Translation Assistant</h1>
+
+        <!-- model picker ---------------------------------------------------- -->
         <div id="model-selector">
             <label>
                 <input type="radio" name="model" value="qwen" checked>
-                <span>Qwen (llama.cpp)</span>
+                <span>Qwen&nbsp;(llama.cpp)</span>
             </label>
             <label>
                 <input type="radio" name="model" value="gemini">
-                <span>Gemini (API)</span>
+                <span>Gemini&nbsp;(API)</span>
             </label>
         </div>
-        <textarea id="original-text-input" placeholder="Enter the sentence to translate"></textarea>
+
+        <!-- navigation + progress bar --------------------------------------- -->
+        <div id="progress-bar">
+            <button id="prev-button" title="Previous sentence">&larr;</button>
+            <span id="progress-text">0&nbsp;/&nbsp;0</span>
+            <button id="next-button" title="Next sentence">&rarr;</button>
+        </div>
+
+        <!-- current sentence (read-only) ------------------------------------ -->
+        <textarea id="original-text-input" placeholder="Sentence will appear here" readonly></textarea>
+
+        <!-- translate trigger ------------------------------------------------ -->
         <button id="translate-button">Translate</button>
+
+        <!-- results + messages ---------------------------------------------- -->
         <div id="alternatives-container"></div>
-        <div id="error-message" style="color: red;"></div>
+        <div id="error-message" style="color:red;"></div>
     </div>
+
+    <!-- scripts -->
     <script src="{{ url_for('static', filename='js/utils.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </body>
