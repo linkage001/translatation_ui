@@ -2,11 +2,72 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     background-color: #f4f4f4;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    padding-top: 60px; /* Equal to header height */
+    box-sizing: border-box;
+}
+
+#prompt-editor {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    background-color: #fafafa;
+}
+
+#prompt-editor h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+#prompt-input {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    resize: vertical;
+}
+
+#update-prompt-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+#update-prompt-button:hover {
+    background-color: #218838;
+}
+
+#prompt-status-message {
+    font-size: 14px;
+    margin-top: 5px;
 }
 
 #model-selector {
@@ -53,6 +114,7 @@ body {
 .container {
     max-width: 800px;
     width: 100%;
+    margin: 0 auto;
     padding: 20px;
     background: white;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
